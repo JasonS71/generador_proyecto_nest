@@ -1,0 +1,19 @@
+{
+  "name": "tarea-3ra-clase",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql": "^2.18.1",
+    "pg": "^8.13.3",
+    "tree-kill": "^1.2.2"
+  }
+}
