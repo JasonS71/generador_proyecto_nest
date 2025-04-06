@@ -53,9 +53,10 @@ function renderProjectStatus(projectName, status, auditData = null, error = null
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Proyecto Generado</title>
+      <title>Administrar Servidor - ${projectName}</title>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
       <style>
         body {
           font-family: 'Roboto', sans-serif;
@@ -89,6 +90,92 @@ function renderProjectStatus(projectName, status, auditData = null, error = null
           border-radius: 50px;
           padding: 12px 24px;
         }
+        .status-badge {
+          display: inline-block;
+          border-radius: 50px;
+          padding: 8px 16px;
+          font-weight: 500;
+          margin-bottom: 20px;
+        }
+        .status-badge.running {
+          background-color: #4CAF50;
+          color: white;
+        }
+        .status-badge.stopped {
+          background-color: #F44336;
+          color: white;
+        }
+        .status-indicator {
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          margin-right: 8px;
+        }
+        .status-indicator.running {
+          background-color: #4CAF50;
+          box-shadow: 0 0 0 rgba(76, 175, 80, 0.4);
+          animation: pulse-green 2s infinite;
+        }
+        .status-indicator.stopped {
+          background-color: #F44336;
+        }
+        @keyframes pulse-green {
+          0% {
+            box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+          }
+          70% {
+            box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+          }
+        }
+        .section-title {
+          position: relative;
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+        }
+        .section-title:after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 40px;
+          height: 3px;
+          background-color: #1a73e8;
+        }
+        .help-card {
+          background-color: #f8f9fa;
+          border-left: 4px solid #1a73e8;
+          padding: 15px;
+          margin-bottom: 20px;
+          border-radius: 4px;
+        }
+        .tab-content {
+          padding: 20px 0;
+        }
+        .nav-tabs .nav-link {
+          border-radius: 8px 8px 0 0;
+          padding: 10px 20px;
+          font-weight: 500;
+        }
+        .nav-tabs .nav-link.active {
+          background-color: #fff;
+          border-color: #dee2e6 #dee2e6 #fff;
+          color: #1a73e8;
+          font-weight: 600;
+        }
+        .audit-empty {
+          text-align: center;
+          padding: 50px 20px;
+          color: #6c757d;
+        }
+        .audit-empty i {
+          font-size: 48px;
+          margin-bottom: 15px;
+          display: block;
+        }
       </style>
     </head>
     <body>
@@ -98,76 +185,167 @@ function renderProjectStatus(projectName, status, auditData = null, error = null
         </div>
       </nav>
       <div class="container py-5">
-        <div class="card modern-card">
-          <div class="card-body">
-            <h3 class="card-title text-center mb-4">🖥️ Estado del Servidor: ${projectName}</h3>
-            
-            <div class="d-flex align-items-center justify-content-center mb-4">
-              <div class="status-indicator ${status === 'En ejecución' ? 'running' : 'stopped'}"></div>
-              <h4 class="mb-0">Estado actual: ${status}</h4>
-            </div>
-
-            <div class="text-center mb-4">
-              <form action="/start-server/${projectName}" method="post" class="d-inline-block mx-2">
-                <button type="submit" class="modern-btn text-white" ${status === 'En ejecución' ? 'disabled' : ''}>
-                  ⚡ Iniciar Servidor
-                </button>
-              </form>
-              <form action="/stop-server/${projectName}" method="post" class="d-inline-block mx-2">
-                <button type="submit" class="btn btn-danger" ${status === 'Detenido' ? 'disabled' : ''}>
-                  🛑 Detener Servidor
-                </button>
-              </form>
-            </div>
-            
-            <!-- Nueva Card de Auditoría -->
-            <div class="card modern-card mt-4">
+        <div class="row">
+          <div class="col-lg-4">
+            <div class="card modern-card mb-4">
               <div class="card-body">
-                <h4 class="card-title mb-4">📝 Auditoría</h4>
-                <form method="POST" action="/refresh-audit/${projectName}">
-                  <button type="submit" class="modern-btn text-white">🔄 Actualizar Datos</button>
-                </form>
+                <h4 class="card-title section-title">Información</h4>
                 
-                ${auditData || error ? `
-                  <div class="mt-4">
+                <div class="mb-3">
+                  <label class="text-muted">Nombre del Proyecto:</label>
+                  <div class="fs-5 fw-bold">${projectName}</div>
+                </div>
+                
+                <div class="text-center my-4">
+                  <div class="status-badge ${status === 'En ejecución' ? 'running' : 'stopped'}">
+                    <span class="status-indicator ${status === 'En ejecución' ? 'running' : 'stopped'}"></span>
+                    ${status}
+                  </div>
+                </div>
+                
+                <div class="help-card">
+                  <h6><i class="bi bi-info-circle-fill me-2"></i>¿Qué significa esto?</h6>
+                  <p class="mb-0">El servidor es necesario para que su aplicación funcione. Cuando está <strong>En ejecución</strong>, su aplicación es accesible.</p>
+                </div>
+                
+                <div class="d-grid gap-2">
+                  <form action="/start-server/${projectName}" method="post">
+                    <button type="submit" class="btn btn-success w-100" ${status === 'En ejecución' ? 'disabled' : ''}>
+                      <i class="bi bi-play-fill me-2"></i>Iniciar Servidor
+                    </button>
+                  </form>
+                  <form action="/stop-server/${projectName}" method="post">
+                    <button type="submit" class="btn btn-danger w-100" ${status === 'Detenido' ? 'disabled' : ''}>
+                      <i class="bi bi-stop-fill me-2"></i>Detener Servidor
+                    </button>
+                  </form>
+                </div>
+                
+                <div class="mt-4">
+                  <a href="/" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-house-fill me-2"></i>Volver al Inicio
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-8">
+            <div class="card modern-card">
+              <div class="card-body">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="audit-tab" data-bs-toggle="tab" data-bs-target="#audit-tab-pane" type="button" role="tab" aria-controls="audit-tab-pane" aria-selected="true">
+                      <i class="bi bi-list-check me-2"></i>Registro de Actividad
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="help-tab" data-bs-toggle="tab" data-bs-target="#help-tab-pane" type="button" role="tab" aria-controls="help-tab-pane" aria-selected="false">
+                      <i class="bi bi-question-circle me-2"></i>Ayuda
+                    </button>
+                  </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                  <div class="tab-pane fade show active" id="audit-tab-pane" role="tabpanel" aria-labelledby="audit-tab" tabindex="0">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <h5 class="card-title section-title">Registro de Actividad</h5>
+                      <form method="POST" action="/refresh-audit/${projectName}">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                          <i class="bi bi-arrow-clockwise me-2"></i>Actualizar
+                        </button>
+                      </form>
+                    </div>
+                    
+                    <p class="text-muted small mb-3">Este registro muestra todos los cambios realizados en la base de datos de su aplicación.</p>
+                    
                     ${error ? `<div class="alert alert-danger">${error}</div>` : ''}
-                    <div class="table-responsive">
-                      <table class="table table-striped">
-                        <thead>
-                          <tr>
-                            <th>Acción</th>
-                            <th>Fecha/Hora</th>
-                            <th>Tabla</th>
-                            <th>Datos</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          ${auditData.length > 0 ? 
-                            auditData.map(entry => `
+                    
+                    ${auditData && auditData.length > 0 ? `
+                      <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                          <thead>
+                            <tr>
+                              <th style="width: 100px">Acción</th>
+                              <th style="width: 180px">Fecha/Hora</th>
+                              <th style="width: 120px">Tabla</th>
+                              <th>Datos</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            ${auditData.map(entry => `
                               <tr>
-                                <td>${entry.action}</td>
+                                <td>
+                                  ${entry.action === 'POST' ? '<span class="badge bg-success">Agregar</span>' : 
+                                    entry.action === 'UPDATE' ? '<span class="badge bg-warning text-dark">Editar</span>' : 
+                                    '<span class="badge bg-danger">Eliminar</span>'}
+                                </td>
                                 <td>${new Date(entry.timestamp).toLocaleString()}</td>
                                 <td>${entry.table}</td>
                                 <td>
-                                  ${Object.entries(entry.data || {})
-                                    .map(([key, value]) => `<div><strong>${key}:</strong> ${value}</div>`)
-                                    .join('')
-                                  }
+                                  <div class="small">
+                                    ${Object.entries(entry.data || {})
+                                      .map(([key, value]) => `<div><strong>${key}:</strong> ${value}</div>`)
+                                      .join('')
+                                    }
+                                  </div>
                                 </td>
                               </tr>
-                            `).join('') 
-                            : `<tr><td colspan="4">No hay registros de auditoría</td></tr>`}
-                        </tbody>
-                      </table>
+                            `).join('')}
+                          </tbody>
+                        </table>
+                      </div>
+                    ` : `
+                      <div class="audit-empty">
+                        <i class="bi bi-clock-history"></i>
+                        <p>No hay registros de actividad disponibles</p>
+                        <p class="small">Los registros aparecerán cuando haya cambios en la base de datos</p>
+                      </div>
+                    `}
+                  </div>
+                  
+                  <div class="tab-pane fade" id="help-tab-pane" role="tabpanel" aria-labelledby="help-tab" tabindex="0">
+                    <h5 class="card-title section-title">Ayuda</h5>
+                    
+                    <div class="accordion" id="helpAccordion">
+                      <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            ¿Cómo acceder a mi aplicación?
+                          </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+                          <div class="accordion-body">
+                            <ol>
+                              <li>Haga clic en <strong>Iniciar Servidor</strong></li>
+                              <li>Espere unos segundos a que el servidor arranque</li>
+                              <li>Acceda a su aplicación en: <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></li>
+                            </ol>
+                            <p class="text-muted small">Asegúrese de que el estado del servidor sea <strong>En ejecución</strong> para que la aplicación funcione.</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            ¿Qué es el Registro de Actividad?
+                          </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                          <div class="accordion-body">
+                            <p>El Registro de Actividad muestra todos los cambios realizados en su base de datos, incluyendo:</p>
+                            <ul>
+                              <li><span class="badge bg-success">Agregar</span> - Cuando se crea un nuevo registro</li>
+                              <li><span class="badge bg-warning text-dark">Editar</span> - Cuando se modifica un registro existente</li>
+                              <li><span class="badge bg-danger">Eliminar</span> - Cuando se elimina un registro</li>
+                            </ul>
+                            <p class="text-muted small">Este registro es útil para rastrear cambios y actividad en su aplicación.</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                ` : '<p class="mt-3 text-muted">No hay datos de auditoría disponibles. Presiona "Actualizar" para cargar información.</p>'}
+                </div>
               </div>
-            </div>
-
-            <!-- Botón de Volver (existente) -->
-            <div class="text-center mt-4">
-              <a href="/" class="modern-btn text-white">🏠 Volver al Inicio</a>
             </div>
           </div>
         </div>
@@ -221,9 +399,10 @@ app.get('/', async (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Selección de Base de Datos</title>
+      <title>Generador de Proyecto - Paso 1</title>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
       <style>
         body {
           font-family: 'Roboto', sans-serif;
@@ -249,6 +428,49 @@ app.get('/', async (req, res) => {
         .navbar {
           background-color: #1a73e8 !important;
         }
+        .step-indicator {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 30px;
+        }
+        .step {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background-color: #ddd;
+          color: #555;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 15px;
+          position: relative;
+          font-weight: bold;
+        }
+        .step.active {
+          background-color: #1a73e8;
+          color: white;
+        }
+        .step:not(:last-child):after {
+          content: '';
+          position: absolute;
+          width: 40px;
+          height: 2px;
+          background-color: #ddd;
+          top: 50%;
+          left: 100%;
+        }
+        .help-text {
+          background-color: #f8f9fa;
+          border-left: 4px solid #1a73e8;
+          padding: 15px;
+          margin-bottom: 20px;
+          border-radius: 4px;
+        }
+        .tooltip-icon {
+          cursor: help;
+          color: #1a73e8;
+          margin-left: 5px;
+        }
       </style>
     </head>
     <body>
@@ -260,17 +482,37 @@ app.get('/', async (req, res) => {
       <div class="container py-5">
         <div class="row justify-content-center">
           <div class="col-md-8">
+            <!-- Indicador de pasos -->
+            <div class="step-indicator">
+              <div class="step active">1</div>
+              <div class="step">2</div>
+              <div class="step">3</div>
+            </div>
+            
             <div class="card modern-card">
               <div class="card-header text-center">
-                <h2 class="mb-0">Seleccione una Base de Datos</h2>
+                <h2 class="mb-0">Paso 1: Seleccionar Base de Datos</h2>
               </div>
               <div class="card-body">
+                <!-- Texto de ayuda -->
+                <div class="help-text">
+                  <h5><i class="bi bi-info-circle-fill me-2"></i>¿Qué es esto?</h5>
+                  <p>
+                    Este es el primer paso para crear su aplicación web. Debe seleccionar una base de datos 
+                    existente que contiene la información que desea gestionar.
+                  </p>
+                  <p class="mb-0">
+                    <strong>¿Qué necesita saber?</strong> Solo seleccione la base de datos que contiene sus tablas de información.
+                  </p>
+                </div>
+                
                 <form method="POST" action="/select-db">
                   <div class="mb-4">
+                    <label class="form-label fw-bold">Seleccione una base de datos de la lista:</label>
                     `;
                     databases.forEach(db => {
                       html += `
-                    <div class="form-check">
+                    <div class="form-check mt-2">
                       <input class="form-check-input" type="radio" name="database" value="${db}" id="${db}">
                       <label class="form-check-label" for="${db}">${db}</label>
                     </div>
@@ -279,7 +521,9 @@ app.get('/', async (req, res) => {
                     html += `
                   </div>
                   <div class="d-grid">
-                    <button type="submit" class="modern-btn text-white">Seleccionar Base de Datos</button>
+                    <button type="submit" class="modern-btn text-white">
+                      <i class="bi bi-arrow-right-circle me-2"></i>Continuar al Paso 2
+                    </button>
                   </div>
                 </form>
               </div>
@@ -331,9 +575,10 @@ app.post('/select-db', async (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Confirmación de Conexión</title>
+      <title>Generador de Proyecto - Paso 2</title>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
       <style>
         body {
           font-family: 'Roboto', sans-serif;
@@ -359,6 +604,70 @@ app.post('/select-db', async (req, res) => {
         .navbar {
           background-color: #1a73e8 !important;
         }
+        .step-indicator {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 30px;
+        }
+        .step {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background-color: #ddd;
+          color: #555;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 15px;
+          position: relative;
+          font-weight: bold;
+        }
+        .step.active {
+          background-color: #1a73e8;
+          color: white;
+        }
+        .step:not(:last-child):after {
+          content: '';
+          position: absolute;
+          width: 40px;
+          height: 2px;
+          background-color: #ddd;
+          top: 50%;
+          left: 100%;
+        }
+        .step.completed {
+          background-color: #4CAF50;
+          color: white;
+        }
+        .step.completed:not(:last-child):after {
+          background-color: #4CAF50;
+        }
+        .help-text {
+          background-color: #f8f9fa;
+          border-left: 4px solid #1a73e8;
+          padding: 15px;
+          margin-bottom: 20px;
+          border-radius: 4px;
+        }
+        .badge-connected {
+          background-color: #4CAF50;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 12px;
+          margin-left: 10px;
+        }
+        .table-selector {
+          max-height: 300px;
+          overflow-y: auto;
+          border: 1px solid #dee2e6;
+          border-radius: 8px;
+          padding: 15px;
+          margin-bottom: 20px;
+        }
+        .select-all-btn {
+          margin-bottom: 10px;
+        }
       </style>
     </head>
     <body>
@@ -368,37 +677,113 @@ app.post('/select-db', async (req, res) => {
         </div>
       </nav>
       <div class="container py-5">
-        <div class="card modern-card">
-          <div class="card-header text-center">
-            <h2 class="mb-0">Conexión Exitosa a la Base de Datos "${selectedDb}"</h2>
-          </div>
-          <div class="card-body">
-            <form method="POST" action="/generate">
-              <div class="mb-3">
-                <label for="project_name" class="form-label">Nombre del Proyecto Nest</label>
-                <input type="text" class="form-control" id="project_name" name="project_name" placeholder="Ingrese el nombre del proyecto" required>
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <!-- Indicador de pasos -->
+            <div class="step-indicator">
+              <div class="step completed">1</div>
+              <div class="step active">2</div>
+              <div class="step">3</div>
+            </div>
+            
+            <div class="card modern-card">
+              <div class="card-header text-center">
+                <h2 class="mb-0">Paso 2: Configurar su Proyecto</h2>
+                <div><span class="badge-connected"><i class="bi bi-check-circle-fill me-1"></i>Conectado a: ${selectedDb}</span></div>
               </div>
-              <div class="mb-4">
-                <p>Seleccione las tablas para las cuales se generarán los módulos:</p>
-                `;
-                tables.forEach(table => {
-                  html += `
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="tables" value="${table}" id="${table}">
-                  <label class="form-check-label" for="${table}">${table}</label>
+              <div class="card-body">
+                <!-- Texto de ayuda -->
+                <div class="help-text">
+                  <h5><i class="bi bi-info-circle-fill me-2"></i>Instrucciones</h5>
+                  <p>Ahora definirá cómo será su proyecto NestJS:</p>
+                  <ol class="mb-0">
+                    <li>Elija un <strong>nombre para su proyecto</strong> (solo letras, números y guiones)</li>
+                    <li>Seleccione las <strong>tablas</strong> que desea incluir en su proyecto</li>
+                  </ol>
                 </div>
-                  `;
-                });
-                html += `
+                <form method="POST" action="/generate">
+                  <div class="mb-4">
+                    <label for="project_name" class="form-label fw-bold">
+                      <i class="bi bi-1-circle-fill me-2"></i>Nombre del Proyecto
+                    </label>
+                    <div class="input-group mb-3">
+                      <span class="input-group-text"><i class="bi bi-folder-fill"></i></span>
+                      <input type="text" class="form-control" id="project_name" name="project_name" 
+                        placeholder="ejemplo_de_nombre_de_proyecto" required>
+                    </div>
+                    <small class="text-muted">Este será el nombre de su proyecto. Use solo letras, números y guiones.</small>
+                  </div>
+                  
+                  <div class="mb-4">
+                    <label class="form-label fw-bold">
+                      <i class="bi bi-2-circle-fill me-2"></i>Tablas a Incluir
+                    </label>
+                    <p class="text-muted mb-2">Seleccione las tablas que desea gestionar en su aplicación</p>
+                    
+                    <button type="button" id="selectAllBtn" class="btn btn-sm btn-outline-primary select-all-btn">
+                      Seleccionar todas
+                    </button>
+                    
+                    <div class="table-selector">
+                      ${tables.length > 0 ? 
+                        tables.map(table => `
+                          <div class="form-check mb-2">
+                            <input class="form-check-input table-checkbox" type="checkbox" name="tables" value="${table}" id="${table}">
+                            <label class="form-check-label" for="${table}">
+                              <strong>${table}</strong>
+                            </label>
+                          </div>
+                        `).join('') 
+                        : '<p class="text-muted">No se encontraron tablas en esta base de datos.</p>'
+                      }
+                    </div>
+                    <div id="selectedCount" class="text-muted mb-3">0 tablas seleccionadas</div>
+                  </div>
+                  
+                  <div class="d-flex justify-content-between">
+                    <a href="/" class="btn btn-outline-secondary">
+                      <i class="bi bi-arrow-left me-2"></i>Volver
+                    </a>
+                    <button type="submit" class="modern-btn text-white">
+                      <i class="bi bi-arrow-right-circle me-2"></i>Continuar al Paso 3
+                    </button>
+                  </div>
+                </form>
               </div>
-              <div class="d-grid">
-                <button type="submit" class="modern-btn text-white">Generar Proyecto Nest</button>
-              </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const selectAllBtn = document.getElementById('selectAllBtn');
+          const checkboxes = document.querySelectorAll('.table-checkbox');
+          const selectedCount = document.getElementById('selectedCount');
+          
+          function updateCount() {
+            const count = document.querySelectorAll('.table-checkbox:checked').length;
+            selectedCount.textContent = count + ' tablas seleccionadas';
+          }
+          
+          checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateCount);
+          });
+          
+          selectAllBtn.addEventListener('click', function() {
+            const isAllSelected = document.querySelectorAll('.table-checkbox:checked').length === checkboxes.length;
+            
+            checkboxes.forEach(checkbox => {
+              checkbox.checked = !isAllSelected;
+            });
+            
+            updateCount();
+            selectAllBtn.textContent = isAllSelected ? 'Seleccionar todas' : 'Deseleccionar todas';
+          });
+          
+          updateCount();
+        });
+      </script>
     </body>
     </html>
     `;
@@ -984,9 +1369,10 @@ app.post('/generate', async (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Proyecto Generado</title>
+      <title>Generador de Proyecto - Finalizado</title>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
       <style>
         body {
           font-family: 'Roboto', sans-serif;
@@ -1020,6 +1406,73 @@ app.post('/generate', async (req, res) => {
           border-radius: 50px;
           padding: 12px 24px;
         }
+        .step-indicator {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 30px;
+        }
+        .step {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background-color: #ddd;
+          color: #555;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 15px;
+          position: relative;
+          font-weight: bold;
+        }
+        .step.active {
+          background-color: #1a73e8;
+          color: white;
+        }
+        .step.completed {
+          background-color: #4CAF50;
+          color: white;
+        }
+        .step:not(:last-child):after {
+          content: '';
+          position: absolute;
+          width: 40px;
+          height: 2px;
+          background-color: #ddd;
+          top: 50%;
+          left: 100%;
+        }
+        .step.completed:not(:last-child):after {
+          background-color: #4CAF50;
+        }
+        .success-icon {
+          font-size: 48px;
+          color: #4CAF50;
+          margin-bottom: 15px;
+        }
+        .table-list {
+          background-color: #f8f9fa;
+          border-radius: 8px;
+          padding: 10px 15px;
+          margin-top: 10px;
+          max-height: 150px;
+          overflow-y: auto;
+        }
+        .table-badge {
+          display: inline-block;
+          background-color: #e9ecef;
+          color: #495057;
+          border-radius: 50px;
+          padding: 5px 10px;
+          margin: 3px;
+          font-size: 14px;
+        }
+        .next-steps {
+          background-color: #f8f9fa;
+          border-left: 4px solid #1a73e8;
+          padding: 15px;
+          margin: 20px 0;
+          border-radius: 4px;
+        }
       </style>
     </head>
     <body>
@@ -1029,20 +1482,50 @@ app.post('/generate', async (req, res) => {
         </div>
       </nav>
       <div class="container py-5">
-        <div class="card modern-card">
-          <div class="card-body text-center py-4">
-            <h3 class="card-title mb-4">✅ Proyecto Generado Exitosamente</h3>
-            <div class="alert alert-success mb-4">
-              <h5 class="mb-0">"${projectName}"</h5>
-              <p class="mb-0 mt-2">Tablas incluidas: ${tables.join(', ')}</p>
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <!-- Indicador de pasos -->
+            <div class="step-indicator">
+              <div class="step completed">1</div>
+              <div class="step completed">2</div>
+              <div class="step completed active">3</div>
             </div>
-            <div class="d-flex justify-content-center">
-              <a href="/project-status/${projectName}" class="modern-btn text-white">
-                🚀 Administrar Servidor
-              </a>
-              <a href="/" class="modern-btn text-white">
-                ↩️ Volver al Inicio
-              </a>
+            
+            <div class="card modern-card">
+              <div class="card-body text-center py-4">
+                <i class="bi bi-check-circle-fill success-icon"></i>
+                <h3 class="card-title mb-3">¡Proyecto Generado Exitosamente!</h3>
+                
+                <div class="alert alert-success mb-4">
+                  <h5 class="mb-2">Nombre del Proyecto: "${projectName}"</h5>
+                  <p class="mb-2">Base de datos: ${newDbName}</p>
+                  <div>
+                    <p class="mb-1">Tablas incluidas (${tables.length}):</p>
+                    <div class="table-list">
+                      ${tables.map(table => `<span class="table-badge">${table}</span>`).join(' ')}
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="next-steps text-start">
+                  <h5><i class="bi bi-arrow-right-circle-fill me-2"></i>Próximos Pasos</h5>
+                  <p>Su aplicación está lista para usar. Ahora puede:</p>
+                  <ol>
+                    <li><strong>Iniciar el servidor</strong> para comenzar a utilizar la aplicación</li>
+                    <li>Ver y gestionar los registros de cambios realizados en la aplicación</li>
+                    <li>Acceder a la API generada para trabajar con sus datos</li>
+                  </ol>
+                </div>
+                
+                <div class="d-flex justify-content-center">
+                  <a href="/project-status/${projectName}" class="modern-btn text-white">
+                    <i class="bi bi-rocket-takeoff-fill me-2"></i>Administrar Servidor
+                  </a>
+                  <a href="/" class="btn btn-outline-secondary mx-2">
+                    <i class="bi bi-house-fill me-2"></i>Volver al Inicio
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1078,7 +1561,6 @@ app.post('/refresh-audit/:projectName', async (req, res) => {
   let error = null;
 
   try {
-    // Ruta del archivo audit_log.txt
     const logFilePath = path.join(__dirname, projectName, 'audit_log.txt');
 
     // Verificar si el archivo existe

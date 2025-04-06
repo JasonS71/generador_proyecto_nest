@@ -41,7 +41,7 @@ cd generador_proyecto_nest
 npm install
 ```
 
-2. Configurar la base de datos:
+3. Configurar la base de datos:
    - Asegúrate de tener PostgreSQL instalado y corriendo
    - Las credenciales por defecto son:
      - Usuario: postgres
@@ -61,11 +61,45 @@ node app.js
 http://localhost:3001
 ```
 
-3. Sigue los pasos en la interfaz web:
-   - Selecciona la base de datos de origen
-   - Ingresa el nombre del nuevo proyecto
-   - Selecciona las tablas para las cuales deseas generar módulos
-   - Espera a que se complete la generación
+3. **Paso 1: Seleccionar Base de Datos**
+   - Seleccione la base de datos de origen que contiene las tablas que desea incluir en su proyecto NestJS
+   
+   ![Paso 1: Selección de Base de Datos](readme_imagenes/seleccion-bd.png)
+   <!-- Incluir aquí la imagen de la interfaz de selección de Base de Datos -->
+
+4. **Paso 2: Configurar el Proyecto**
+   - Ingrese un nombre para su proyecto
+   - Seleccione las tablas que desea incluir en su aplicación
+   - Puede usar el botón "Seleccionar todas" para mayor comodidad
+   
+   ![Paso 2: Configuración del Proyecto](readme_imagenes/configuracion-proyecto.png)
+   <!-- Incluir aquí la imagen de la interfaz de selección de tablas -->
+
+5. **Paso 3: Proyecto Generado**
+   - Una vez completado el proceso, verá una pantalla de confirmación con los detalles del proyecto
+   - Se mostrará el nombre del proyecto, la base de datos creada y las tablas incluidas
+   
+   ![Paso 3: Proyecto Generado](readme_imagenes/proyecto-generado.png)
+   <!-- Incluir aquí la imagen de la pantalla de éxito -->
+
+6. **Administrar Servidor**
+   - Desde la pantalla de administración puede iniciar o detener el servidor
+   - El panel izquierdo muestra información del proyecto y controles del servidor
+   - El panel derecho muestra el registro de actividad
+   
+   ![Administración del Servidor](readme_imagenes/administracion-servidor.png)
+   <!-- Incluir aquí la imagen de la pantalla de gestión del servidor con auditoría vacía -->
+
+7. **Visualización de Auditoría**
+   - Una vez que realice operaciones en su aplicación, podrá ver el registro de actividad
+   - Cada acción (Agregar, Editar, Eliminar) se registra con fecha, hora y detalles
+   
+   ![Registro de Auditoría](readme_imagenes/auditoria-datos.png)
+   <!-- Incluir aquí la imagen de la pantalla de gestión con datos de auditoría -->
+
+## Estructura del Proyecto Generado
+
+Para cada tabla seleccionada, se generan los siguientes archivos:
 
 4. Una vez generado el proyecto:
    - Puedes iniciar/detener el servidor desde la interfaz
@@ -97,6 +131,5 @@ Los registros de auditoría incluyen:
 - Express.js
 - PostgreSQL
 - NestJS
-- TypeScript
 - Bootstrap 5
 - Crypto (Node.js)
